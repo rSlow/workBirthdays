@@ -1,0 +1,14 @@
+{% macro birthday_form(date, birthdays=[]) %}
+
+    {% for birthday in birthdays %}
+        - {{ birthday.post }}
+
+        {% if birthday.rank %}
+            {{ birthday.rank }}
+        {% endif %}
+
+        {{ birthday.fio }} - {{ birthday.age }} {{ birthday.declension }}
+        <br>
+    {% endfor %}
+
+{% endmacro %}

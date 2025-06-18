@@ -1,0 +1,14 @@
+{% from "birthdays/includes/birthday_forms.jinja2" import birthday_form %}
+
+{% if dates %}
+    {% for date, birthdays in dates.items() %}
+        {% if birthdays %}
+            <u><b>{{ date|date }} г. день рождения:</b></u> <br>
+            {{ birthday_form(date=date, birthdays=birthdays) }}
+            <br>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    Ни у кого в ближайшее время нет дня рождения.
+{% endif %}
+

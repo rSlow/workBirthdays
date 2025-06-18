@@ -1,0 +1,13 @@
+{% from "birthdays/includes/birthday_forms.jinja2" import birthday_form %}
+
+{% if today_birthdays %}
+    <u><b>Сегодня день рождения:</b></u> <br>
+    {{ birthday_form(birthdays=today_birthdays) }}
+{% endif %}
+
+    <br>
+
+{% if tomorrow_birthdays %}
+    <u><b>Завтра день рождения:</b></u> <br>
+    {{ birthday_form(birthdays=tomorrow_birthdays) }}
+{% endif %}

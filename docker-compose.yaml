@@ -1,0 +1,134 @@
+services:
+
+  #####  SERVICES  #####
+
+  aiogram:
+    build: .
+    ports:
+      - "127.0.0.1:${EXPOSE_API:-8000}:8000"
+    volumes:
+      - type: "bind"
+        source: "./log/"
+        target: "/app/log/"
+      - type: "bind"
+        source: "./temp/"
+        target: "/app/temp/"
+      - type: "bind"
+        source: "./config/"
+        target: "/app/config/"
+        read_only: true
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+      - migrations
+    restart: always
+    entrypoint:
+      [ "poetry", "run", "python", "-m", "workBirthdays" ]
+    profiles:
+      - services
+
+  taskiq:
+    build: .
+    restart: always
+    volumes:
+      - type: "bind"
+        source: "./temp/"
+        target: "/app/temp/"
+      - type: "bind"
+        source: "./config/"
+        target: "/app/config/"
+        read_only: true
+    depends_on:
+      - rabbitmq
+      - postgres
+      - redis
+      - migrations
+    entrypoint:
+      [ "poetry", "run", "taskiq", "worker", "--tasks-pattern", "['**/tasks']", "workBirthdays.mq.run:broker" ]
+    profiles:
+      - services
+
+  #####  RUNNERS  #####
+
+  postgres:
+    image: postgres
+    restart: always
+    env_file:
+      - ${DOCKER_ENV_FILE:-.env}
+    ports:
+      - "127.0.0.1:${EXPOSE_PG:-5432}:5432"
+    volumes:
+      - type: "volume"
+        source: "postgres"
+        target: "/app/pgdata/workBirthdays/"
+    environment:
+      PGDATA: /app/pgdata/workBirthdays/
+    profiles:
+      - runners
+
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - "127.0.0.1:${EXPOSE_REDIS:-6379}:6379"
+    volumes:
+      - type: "volume"
+        source: "redis"
+        target: "/data/"
+    env_file:
+      - ${DOCKER_ENV_FILE:-.env}
+    command:
+      - "redis-server"
+      - "--loglevel ${REDIS_LOGLEVEL:-warning}"
+      - "--databases 2"
+      - "--save 900 1"
+      - "--save 300 10"
+      - "--save 60 10000"
+      - "--maxmemory ${REDIS_MAXMEM:-50mb}"
+      - "--maxmemory-policy ${REDIS_POLICY:-noeviction}"
+      - "--requirepass ${REDIS_PASSWORD}"
+    profiles:
+      - runners
+
+  rabbitmq:
+    image: rabbitmq:management
+    restart: always
+    ports:
+      - "127.0.0.1:${EXPOSE_RABBITMQ}:5672"
+      - "${EXPOSE_RABBITMQ_HTTP}:15672"
+    volumes:
+      - type: "volume"
+        source: "rabbitmq"
+        target: "/var/lib/rabbitmq/"
+    env_file:
+      - ${DOCKER_ENV_FILE:-.env}
+    environment:
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit log_levels [{connection,error},{default,error}] disk_free_limit 2147483648
+    profiles:
+      - runners
+
+  #####  STARTERS  #####
+
+  migrations:
+    restart: "no"
+    build: .
+    volumes:
+      - type: "bind"
+        source: "./alembic.ini"
+        target: "/app/alembic.ini"
+        read_only: true
+      - type: "bind"
+        source: "./config/"
+        target: "/app/config/"
+        read_only: true
+    entrypoint: [ "poetry", "run", "alembic", "upgrade", "heads" ]
+    depends_on:
+      - postgres
+    profiles:
+      - starters
+
+volumes:
+  redis:
+  postgres:
+  rabbitmq:

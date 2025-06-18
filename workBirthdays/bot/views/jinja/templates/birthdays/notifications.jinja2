@@ -1,0 +1,10 @@
+{% if notifications %}
+    Установлены следующие метки оповещения: <br>
+    {% for notification, _ in notifications %}
+        - {{ notification.time|time }} <br>
+    {% endfor %}
+{% else %}
+    Не установлено ни одной метки оповещения.
+{% endif %}
+<br>
+Выберите действие:
