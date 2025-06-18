@@ -20,32 +20,10 @@ services:
     depends_on:
       - postgres
       - redis
-      - rabbitmq
       - migrations
     restart: always
     entrypoint:
       [ "poetry", "run", "python", "-m", "workBirthdays" ]
-    profiles:
-      - services
-
-  taskiq:
-    build: .
-    restart: always
-    volumes:
-      - type: "bind"
-        source: "./temp/"
-        target: "/app/temp/"
-      - type: "bind"
-        source: "./config/"
-        target: "/app/config/"
-        read_only: true
-    depends_on:
-      - rabbitmq
-      - postgres
-      - redis
-      - migrations
-    entrypoint:
-      [ "poetry", "run", "taskiq", "worker", "--tasks-pattern", "['**/tasks']", "workBirthdays.mq.run:broker" ]
     profiles:
       - services
 
@@ -91,23 +69,6 @@ services:
     profiles:
       - runners
 
-  rabbitmq:
-    image: rabbitmq:management
-    restart: always
-    ports:
-      - "127.0.0.1:${EXPOSE_RABBITMQ}:5672"
-      - "${EXPOSE_RABBITMQ_HTTP}:15672"
-    volumes:
-      - type: "volume"
-        source: "rabbitmq"
-        target: "/var/lib/rabbitmq/"
-    env_file:
-      - ${DOCKER_ENV_FILE:-.env}
-    environment:
-      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit log_levels [{connection,error},{default,error}] disk_free_limit 2147483648
-    profiles:
-      - runners
-
   #####  STARTERS  #####
 
   migrations:
@@ -131,4 +92,3 @@ services:
 volumes:
   redis:
   postgres:
-  rabbitmq:

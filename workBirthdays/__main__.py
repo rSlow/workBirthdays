@@ -25,7 +25,6 @@ from workBirthdays.core.db.dao.user import UserDao
 from workBirthdays.core.di import get_common_providers
 from workBirthdays.core.scheduler.scheduler import ApScheduler
 from workBirthdays.core.utils import di_visual
-from workBirthdays.mq.broker import broker
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +92,6 @@ async def on_startup(
     logger.info("as webhook url used %s", webhook_url)
 
     await ui.setup(bot)
-    await broker.startup()
 
     await dishka.get(ApScheduler)  # run scheduler
 

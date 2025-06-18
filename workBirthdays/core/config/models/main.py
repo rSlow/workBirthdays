@@ -7,7 +7,6 @@ from typing import final
 from .app import AppConfig
 from .auth import SecurityConfig
 from .db import DBConfig
-from .taskiq import MQConfig
 from .paths import Paths
 from .redis import RedisConfig
 from .web import WebConfig
@@ -19,7 +18,6 @@ class BaseConfig:
     paths: Paths
     db: DBConfig
     redis: RedisConfig
-    mq: MQConfig
     web: WebConfig
     auth: SecurityConfig
 
@@ -43,5 +41,5 @@ class BaseConfig:
     def as_base(self):
         return BaseConfig(
             app=self.app, paths=self.paths, db=self.db, redis=self.redis,
-            mq=self.mq, web=self.web, auth=self.auth,
+            web=self.web, auth=self.auth,
         )
