@@ -127,7 +127,7 @@ async def add_time_notification_getter(**__):
 add_time_notification_dialog = Dialog(
     Window(
         Const(f"Введите время в формате {dates.TIME_FORMAT_USER}"),
-        Const("Например: {now}"),
+        Format("Например: <code>{now}</code>"),
         TextInput(
             id="time_to_add",
             type_factory=time_from_text,
