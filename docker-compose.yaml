@@ -57,7 +57,7 @@ services:
     env_file:
       - ${DOCKER_ENV_FILE:-.env}
     ports:
-      - "127.0.0.1:${EXPOSE_PG:-5432}:5432"
+      - "${EXPOSE_PG:-5432}:5432"
     volumes:
       - type: "volume"
         source: "postgres"
