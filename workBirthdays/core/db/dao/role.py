@@ -15,6 +15,13 @@ class RoleDao(BaseDao[db.Role]):
         db_role = await self._get_by_id(role_id)
         return db_role.to_dto()
 
+    async def get_by_name(self, role_name: str):
+        db_role = await self.session.scalars(
+            select(self.model)
+            .where(self.model.name == role_name)
+        )
+        return db_role.one().to_dto()
+
     async def delete(self, role_id: int):
         await self.session.execute(
             delete(self.model)

@@ -14,24 +14,23 @@ from workBirthdays.bot.states.birthdays import AddUserContextSG, RemoveUserConte
 from workBirthdays.bot.utils.dialog_factory import choice_dialog_factory
 from workBirthdays.bot.views import buttons
 from workBirthdays.core.db import dto
-from workBirthdays.core.db.dao import UserDao
+from workBirthdays.core.db.dao import UserDao, RoleDao
 
 
 @inject
 async def on_user_id_input(
         message: types.Message, _widget: ManagedTextInput[int], manager: DialogManager,
-        user_id: int, dao: FromDishka[UserDao]
+        user_id: int, user_dao: FromDishka[UserDao], role_dao: FromDishka[RoleDao],
 ):
     try:
-        user = await dao.get_by_tg_id(user_id)
+        user = await user_dao.get_by_tg_id(user_id)
         await message.answer(f"Выбран контекст пользователя {user.short_mention}.")
 
     except NoResultFound:
-        user = dto.User(
-            tg_id=user_id, is_bot=True, is_active=True,
-            roles=["birthdays"]
-        )
-        await dao.upsert_user(user)
+        user = dto.User(tg_id=user_id, is_bot=False, is_active=True)
+        db_user = await user_dao.upsert_user(user)
+        birthdays_role = await role_dao.get_by_name("birthdays")
+        await role_dao.add_user(birthdays_role.id_, db_user.id_)
         await message.answer(f"Создан пользователь c ID={user.tg_id}.")
         await message.answer(f"Выбран контекст пользователя c ID={user.tg_id}.")
 
