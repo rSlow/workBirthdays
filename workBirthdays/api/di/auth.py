@@ -8,7 +8,7 @@ from workBirthdays.api.utils.auth import AuthService
 from workBirthdays.api.utils.auth.cookie import OAuth2PasswordBearerWithCookie
 from workBirthdays.api.utils.exceptions import AuthError
 from workBirthdays.core.db import dto
-from workBirthdays.core.db.dao import DaoHolder
+from workBirthdays.core.db.dao import UserDao
 
 
 class AuthProvider(Provider):
@@ -28,7 +28,7 @@ class AuthProvider(Provider):
             request: Request,
             cookie_auth: OAuth2PasswordBearerWithCookie,
             auth_service: AuthService,
-            dao: DaoHolder,
+            dao: UserDao,
     ) -> dto.User:
         try:
             token = await cookie_auth.get_token(request)

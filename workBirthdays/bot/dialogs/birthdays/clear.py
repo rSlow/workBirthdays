@@ -14,7 +14,7 @@ from workBirthdays.core.db.dao.birthday import BirthdayDao
 async def clear_birthdays(
         callback: types.CallbackQuery, _, manager: DialogManager, dao: FromDishka[BirthdayDao]
 ):
-    user: dto.User = manager.middleware_data["user"]
+    user: dto.User = manager.middleware_data["context_user"]
     await dao.delete_all_from_user(user.id_)
     await callback.message.answer("Все дни рождения удалены.")
     manager.show_mode = ShowMode.DELETE_AND_SEND
@@ -25,5 +25,5 @@ clear_dialog = choice_dialog_factory(
     Const("Очистка всех данных о днях рождения."),
     Const("Вы уверены?"),
     state=ClearBirthdaysSG.state,
-    on_click=clear_birthdays  # noqa
+    on_click=clear_birthdays
 )

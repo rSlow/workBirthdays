@@ -15,13 +15,13 @@ from dishka.integrations.aiogram import inject
 from workBirthdays.bot.utils.exceptions import UserNotifyException
 from workBirthdays.bot.utils.markdown import get_update_text
 from workBirthdays.bot.views.alert import BotAlert
-from workBirthdays.core.db.dao import DaoHolder
+from workBirthdays.core.db.dao import UserDao
 from workBirthdays.core.utils.exceptions.base import BaseError
 
 logger = logging.getLogger(__name__)
 
 
-def get_chat_id_from_error(error: ErrorEvent) -> int:
+def get_chat_id_from_error(error: ErrorEvent) -> int | None:
     update = error.update
     if update.callback_query:
         return update.callback_query.message.chat.id
@@ -31,7 +31,7 @@ def get_chat_id_from_error(error: ErrorEvent) -> int:
         return update.business_message.chat.id
 
 
-def get_user_id_from_error(error: ErrorEvent) -> int:
+def get_user_id_from_error(error: ErrorEvent) -> int | None:
     update = error.update
     if update.callback_query:
         return update.callback_query.from_user.id
@@ -41,9 +41,10 @@ def get_user_id_from_error(error: ErrorEvent) -> int:
         return update.business_message.from_user.id
 
 
-async def bot_blocked(error: ErrorEvent, dao: DaoHolder):
+@inject
+async def bot_blocked(error: ErrorEvent, dao: UserDao):
     user_id = get_user_id_from_error(error)
-    await dao.user.deactivate(user_id)
+    await dao.deactivate(user_id)
     logger.info("Деактивирован пользователь с ID %s", user_id)
 
 

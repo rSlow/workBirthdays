@@ -10,6 +10,7 @@ from workBirthdays.bot.utils.exceptions import (
     UnknownEventTypeError, PassEventException
 )
 from workBirthdays.core.db import dto
+from workBirthdays.core.db.dao import EventLogDao
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +34,9 @@ class EventLoggingMiddleware(BaseMiddleware):
     ):
         try:
             event_dto = _parse_event(event)
-            dao = data["dao"]
-            await dao.log.write_event(event_dto)
+            container = data["dishka_container"]
+            event_dao = await container.get(EventLogDao)
+            await event_dao.write_event(event_dto)
 
         except UnknownEventTypeError as ex:
             logger.warning(ex)

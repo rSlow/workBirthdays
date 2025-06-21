@@ -8,3 +8,6 @@ CalendarSG = FSMSingleFactory("CalendarSG")
 BirthdaysNotificationSG = FSMSingleFactory("BirthdaysNotificationSG")
 ClearNotificationSG = FSMSingleFactory("ClearNotificationSG")
 AddNotificationTimeSG = FSMSingleFactory("AddNotificationTimeSG")
+
+AddUserContextSG = FSMSingleFactory("AddUserContextSG")
+RemoveUserContextSG = FSMSingleFactory("RemoveUserContextSG")

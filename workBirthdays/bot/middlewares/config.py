@@ -15,7 +15,6 @@ from workBirthdays.bot.di.jinja import JinjaRenderer
 from workBirthdays.bot.views.alert import BotAlert
 from workBirthdays.core.config import Paths
 from workBirthdays.core.db import dto
-from workBirthdays.core.db.dao import DaoHolder
 from workBirthdays.core.scheduler.scheduler import Scheduler
 from workBirthdays.core.utils.lock_factory import LockFactory
 
@@ -51,5 +50,5 @@ class MiddlewareData(DialogMiddlewareData, total=False):
 
     bot_config: BotConfig
 
-    dao: DaoHolder
     user: dto.User | None
+    context_user: dto.User | None

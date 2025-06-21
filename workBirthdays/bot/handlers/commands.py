@@ -9,19 +9,19 @@ from workBirthdays.bot.di.jinja import JinjaRenderer
 from workBirthdays.bot.states.start import MainMenuSG
 from workBirthdays.bot.views import commands
 from workBirthdays.core.db import dto
-from workBirthdays.core.db.dao import DaoHolder
+from workBirthdays.core.db.dao import EventLogDao
 
 
 @inject
 async def cmd_start(
-        message: types.Message, dialog_manager: DialogManager, user: dto.User,bot:Bot,
-        dao: FromDishka[DaoHolder], jinja: FromDishka[JinjaRenderer],
+        message: types.Message, dialog_manager: DialogManager, user: dto.User, bot: Bot,
+        dao: FromDishka[EventLogDao], jinja: FromDishka[JinjaRenderer],
 ):
-    start_event = await dao.log.get_last_by_user(user.tg_id, "/start")
+    start_event = await dao.get_last_by_user(user.tg_id, "/start")
     if start_event is None:
         welcome_message = jinja.render_template(
             "commands/start.jinja2",
-            {"bot_name":(await bot.get_me()).name}
+            {"bot_name": (await bot.get_my_name()).name}
         )
         await message.answer(welcome_message)
 

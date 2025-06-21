@@ -24,9 +24,9 @@ from workBirthdays.core.utils.dates import get_now
 
 @inject
 async def main_getter(
-        user: dto.User, note_dao: FromDishka[UserNotificationDao], **__
+        context_user: dto.User, note_dao: FromDishka[UserNotificationDao], **__
 ):
-    notifications = await note_dao.get_user_notifications(user_id=user.id_)
+    notifications = await note_dao.get_user_notifications(user_id=context_user.id_)
     notification_values = [
         (
             notification,
@@ -87,7 +87,7 @@ async def clear_notifications(
         callback: types.CallbackQuery, _, manager: DialogManager,
         dao: FromDishka[UserNotificationDao], scheduler: FromDishka[ApScheduler]
 ):
-    user: dto.User = manager.middleware_data["user"]
+    user: dto.User = manager.middleware_data["context_user"]
     notifications = await dao.get_user_notifications(user_id=user.id_)
     await dao.clear_notifications(user_id=user.id_)
     for notification in notifications:
@@ -110,7 +110,7 @@ async def success_time_add_handler(
         message: types.Message, _, manager: DialogManager, valid_time: time,
         dao: FromDishka[UserNotificationDao], scheduler: FromDishka[ApScheduler]
 ):
-    user: dto.User = manager.middleware_data["user"]
+    user: dto.User = manager.middleware_data["context_user"]
     notification = await dao.add_notification(user_id=user.id_, notification_time=valid_time)
     user_state = await dao.get_user_state(user.id_)
     scheduler.add_birthday_notification(notification, user_state)

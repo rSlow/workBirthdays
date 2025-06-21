@@ -10,6 +10,7 @@ from .notifications import (
     clear_notifications_dialog
 )
 from .time_correction import time_correction_dialog
+from .user_context import add_user_context_dialog, remove_user_context_dialog
 
 
 def setup():
@@ -24,6 +25,8 @@ def setup():
         notifications_dialog,
         add_time_notification_dialog,
         clear_notifications_dialog,
+        add_user_context_dialog,
+        remove_user_context_dialog,
     )
 
     return router

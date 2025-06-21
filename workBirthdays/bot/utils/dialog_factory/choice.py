@@ -6,7 +6,9 @@ from aiogram_dialog.widgets.text import Text, Const
 from aiogram_dialog.widgets.utils import GetterVariant
 
 
-def choice_dialog_factory(*texts: Text, state: State, on_click: OnClick):
+def choice_dialog_factory(
+        *texts: Text, state: State, on_click: OnClick, getter: GetterVariant = None
+):
     return Dialog(
         Window(
             *texts,
@@ -18,7 +20,8 @@ def choice_dialog_factory(*texts: Text, state: State, on_click: OnClick):
                 ),
                 Cancel(Const("Нет"))
             ),
-            state=state
+            state=state,
+            getter=getter,
         )
     )
 

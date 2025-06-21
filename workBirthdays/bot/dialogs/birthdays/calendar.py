@@ -18,7 +18,7 @@ async def on_date_selected(
         callback: ChatEvent, _, manager: DialogManager, selected_date: date,
         jinja: FromDishka[JinjaRenderer], dao: FromDishka[BirthdayDao]
 ):
-    user: dto.User = manager.middleware_data["user"]
+    user: dto.User = manager.middleware_data["context_user"]
     birthdays = await dao.get_by_date(d=selected_date, user_id=user.id_)
     if not birthdays:
         return await callback.answer("Нет дней рождения.", show_alert=True)

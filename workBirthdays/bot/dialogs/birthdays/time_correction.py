@@ -22,7 +22,7 @@ async def success_handler(
         message: types.Message, _, manager: DialogManager, valid_time: time,
         dao: FromDishka[UserNotificationDao], scheduler: FromDishka[ApScheduler]
 ):
-    user: dto.User = manager.middleware_data["user"]
+    user: dto.User = manager.middleware_data["context_user"]
     timeshift = get_timeshift(valid_time)
     user_state = await dao.add_or_update_user_state(user.id_, timeshift)
     notifications = await dao.get_user_notifications(user.id_)
