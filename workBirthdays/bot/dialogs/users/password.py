@@ -13,8 +13,8 @@ from workBirthdays.core.utils.auth import SecurityProps
 
 
 @inject
-async def user_with_password_getter(user: dto.User, user_dao: FromDishka[UserDao], **__):
-    user_with_creds = await user_dao.get_by_tg_id_with_password(user.tg_id)
+async def user_with_password_getter(context_user: dto.User, user_dao: FromDishka[UserDao], **__):
+    user_with_creds = await user_dao.get_by_tg_id_with_password(context_user.tg_id)
     return {"has_password": user_with_creds.hashed_password is not None}
 
 
@@ -24,7 +24,7 @@ async def set_password(
         dao: FromDishka[UserDao], security: FromDishka[SecurityProps]
 ):
     hashed_password = security.get_password_hash(data)
-    user: dto.User = manager.middleware_data["user"]
+    user: dto.User = manager.middleware_data["context_user"]
     await dao.set_password(user, hashed_password)
     await message.answer("Пароль обновлен.")
     await manager.done()

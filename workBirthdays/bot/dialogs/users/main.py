@@ -13,8 +13,8 @@ from workBirthdays.core.db.dao.user import UserDao
 
 
 @inject
-async def main_window_getter(user: dto.User, user_dao: FromDishka[UserDao], **__):
-    user_with_creds = await user_dao.get_by_tg_id_with_password(user.tg_id)
+async def main_window_getter(context_user: dto.User, user_dao: FromDishka[UserDao], **__):
+    user_with_creds = await user_dao.get_by_tg_id_with_password(context_user.tg_id)
     return {"has_password": user_with_creds.hashed_password is not None}
 
 
@@ -23,7 +23,7 @@ async def send_token(
         callback: types.CallbackQuery, _, manager: DialogManager,
         auth: FromDishka[AuthService], dao: FromDishka[UserDao]
 ):
-    user: dto.User = manager.middleware_data["user"]
+    user: dto.User = manager.middleware_data["context_user"]
     user_with_creds = await dao.get_by_tg_id_with_password(user.tg_id)
     basic = auth.create_user_basic_token(user_with_creds)
     token = basic.split(" ", maxsplit=1)[1]

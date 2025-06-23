@@ -1,7 +1,7 @@
 from datetime import date
 from uuid import UUID
 
-from sqlalchemy import delete, select, and_, extract
+from sqlalchemy import delete, select, and_, extract, func
 
 from workBirthdays.core.db import dto
 from workBirthdays.core.db import models as db
@@ -13,6 +13,7 @@ class BirthdayDao(BaseDao[db.Birthday]):
         await self.session.execute(
             delete(self.model)
             .filter(self.model.uuid.in_([birthday.uuid for birthday in birthdays]))
+            .filter(self.model.user_id == user_id)
         )
         models = [
             self.model(
@@ -33,17 +34,17 @@ class BirthdayDao(BaseDao[db.Birthday]):
 
     async def delete(self, birthday_uuid: UUID):
         res = await self.session.execute(
-            select(self.model)
+            select(func.count(self.model.uuid))
             .filter(self.model.uuid == birthday_uuid)
         )
-        birthday: db.Birthday | None = res.one_or_none()
+        birthday_rows_count = res.scalar_one()
 
-        if birthday is None:
+        if birthday_rows_count == 0:
             return False
 
         await self.session.execute(
             delete(self.model)
-            .filter(self.model.uuid == birthday.uuid)
+            .filter(self.model.uuid == birthday_uuid)
         )
         await self.commit()
         return True

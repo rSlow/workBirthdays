@@ -11,7 +11,7 @@ from ..base import Base
 class Birthday(Base):
     __tablename__ = "birthdays"
 
-    uuid: Mapped[UUID] = mapped_column(unique=True)
+    uuid: Mapped[UUID]
     user_id: Mapped[int] = mapped_column(BigInteger)
     fio: Mapped[str]
     date: Mapped[date]
